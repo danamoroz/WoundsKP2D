@@ -16,6 +16,7 @@ from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 
 from kp2d.datasets.patches_dataset import PatchesDataset
+from kp2d.datasets.wounds_dataset import WoundsDataset
 from kp2d.evaluation.evaluate import evaluate_keypoint_net
 from kp2d.networks.keypoint_net import KeypointNet
 from kp2d.networks.keypoint_resnet import KeypointResnet
@@ -56,9 +57,11 @@ def main():
     eval_params += [{'res': (640, 480), 'top_k': 1000, }]
 
     for params in eval_params:
-        hp_dataset = PatchesDataset(root_dir=args.input_dir, use_color=True,
-                                    output_shape=params['res'], type='a')
-        data_loader = DataLoader(hp_dataset,
+        #hp_dataset = PatchesDataset(root_dir=args.input_dir, use_color=True,
+        #                            output_shape=params['res'], type='a')
+        wound_dataset = WoundsDataset(root_dir=args.input_dir, use_color=True,
+                                    output_shape=params['res'])
+        data_loader = DataLoader(wound_dataset,
                                  batch_size=1,
                                  pin_memory=False,
                                  shuffle=False,
