@@ -104,7 +104,12 @@ def compute_repeatability(data, keep_k_points=300, distance_thresh=3):
         le2 = min2[correct2].sum()
     if N1 + N2 > 0:
         repeatability = (count1 + count2) / (N1 + N2)
-        loc_err = (le1 + le2) / (count1 + count2)
+
+        if (count1 + count2 != 0):
+            loc_err = (le1 + le2) / (count1 + count2)
+        else:
+            loc_err = -1
+            
     else:
         repeatability = -1
         loc_err = -1
