@@ -65,7 +65,7 @@ def evaluate_keypoint_net(data_loader, keypoint_net, output_shape=(320, 240), to
                 shape_for_data = sample['image'].shape
             else:
                 shape_for_data = output_shape
-            #print(sample['image'].shape)
+            
             data = {'image': sample['image'].numpy().squeeze(),
                     'image_shape' : shape_for_data,
                     'warped_image': sample['warped_image'].numpy().squeeze(),

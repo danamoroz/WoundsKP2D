@@ -35,9 +35,11 @@ def main():
     eval_params += [{'res': (560,400), 'top_k': 600, }]
 
     for params in eval_params:
-        wound_dataset = WoundsDataset(root_dir=args.input_dir, use_color=True,
-                                    output_shape=params['res'])
-        data_loader = DataLoader(wound_dataset,
+        #wound_dataset = WoundsDataset(root_dir=args.input_dir, use_color=True,
+        #                            output_shape=params['res'])
+        hp_dataset = PatchesDataset(root_dir=args.input_dir, use_color=True,
+                                    output_shape=params['res'], type='a')
+        data_loader = DataLoader(hp_dataset,
                                  batch_size=1,
                                  pin_memory=False,
                                  shuffle=False,
