@@ -119,10 +119,14 @@ def evaluate_sift(data_loader, output_shape=(320, 240), top_k=300, use_color=Tru
 
     for i, sample in tqdm(enumerate(data_loader), desc="evaluate_sift"):
 
-        image = to_gray_normalized(sample['image'].cuda())
-        warped_image = to_gray_normalized(sample['warped_image'].cuda())
+        image = sample['image']
+        warped_image = sample['warped_image']
+        image = np.uint8(image.cpu().squeeze() * 255)
+        warped_image = np.uint8(warped_image.cpu().squeeze() * 255)
 
-        im1 = np.uint8(image.cpu().squeeze() * 255)
+        im1 = np.moveaxis(image, 0, -1)
+        im2 = np.moveaxis(warped_image, 0, -1)
+
         keypoints1, desc1 = sift.detectAndCompute(im1, None)
         x1 = np.expand_dims(np.array([k.pt[0] for k in keypoints1]), axis=1)
         y1 = np.expand_dims(np.array([k.pt[1] for k in keypoints1]), axis=1)
@@ -130,7 +134,6 @@ def evaluate_sift(data_loader, output_shape=(320, 240), top_k=300, use_color=Tru
         score_1 = np.concatenate((x1, y1, probs1),axis=1)
         desc1 = np.array(desc1)
 
-        im2 = np.uint8(image.cpu().squeeze() * 255)
         keypoints2, desc2 = sift.detectAndCompute(im2, None)
         x2 = np.expand_dims(np.array([k.pt[0] for k in keypoints2]), axis=1)
         y2 = np.expand_dims(np.array([k.pt[1] for k in keypoints2]), axis=1)
