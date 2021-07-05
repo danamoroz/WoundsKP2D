@@ -51,17 +51,15 @@ def draw_matches(data, keep_k_points=1000):
     warped_keypoints, warped_desc = select_k_best(warped_keypoints, warped_desc, keep_k_points)
     
     # Match the keypoints with the warped_keypoints with nearest neighbor search
-    # This part needs to be done with crossCheck=False.
-    # All the matched pairs need to be evaluated without any selection.
-    bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=False)
+    bf = cv2.BFMatcher(cv2.NORM_L2, crossCheck=True)
 
     matches = bf.match(desc, warped_desc)
     
     # Sort them in the order of their distance.
     matches = sorted(matches, key = lambda x:x.distance)
 
-    keypoints1 = [cv2.KeyPoint(p[1], p[0], 1) for p in keypoints]
-    keypoints2 = [cv2.KeyPoint(p[1], p[0], 1) for p in warped_keypoints]
+    keypoints1 = [cv2.KeyPoint(p[0], p[1], 1) for p in keypoints]
+    keypoints2 = [cv2.KeyPoint(p[0], p[1], 1) for p in warped_keypoints]
 
     image = np.uint8(image.cpu().squeeze() * 255)
     warped_image = np.uint8(warped_image.cpu().squeeze() * 255)
