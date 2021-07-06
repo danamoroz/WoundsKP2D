@@ -17,6 +17,7 @@ from tqdm import tqdm
 from kp2d.datasets.patches_dataset import PatchesDataset
 from kp2d.datasets.wounds_dataset import WoundsDataset
 from kp2d.evaluation.evaluate import evaluate_sift
+from kp2d.evaluation.draw import draw_sift_func
 from kp2d.networks.keypoint_net import KeypointNet
 from kp2d.networks.keypoint_resnet import KeypointResnet
 
@@ -35,11 +36,11 @@ def main():
     eval_params += [{'res': (560,400), 'top_k': 600, }]
 
     for params in eval_params:
-        wound_dataset = WoundsDataset(root_dir=args.input_dir, use_color=True,
-                                    output_shape=params['res'])
-        #hp_dataset = PatchesDataset(root_dir=args.input_dir, use_color=True,
-        #                            output_shape=params['res'], type='a')
-        data_loader = DataLoader(wound_dataset,
+        #wound_dataset = WoundsDataset(root_dir=args.input_dir, use_color=True,
+        #                            output_shape=params['res'])
+        hp_dataset = PatchesDataset(root_dir=args.input_dir, use_color=True,
+                                    output_shape=params['res'], type='a')
+        data_loader = DataLoader(hp_dataset,
                                  batch_size=1,
                                  pin_memory=False,
                                  shuffle=False,
@@ -47,19 +48,12 @@ def main():
                                  worker_init_fn=None,
                                  sampler=None)
 
-        print(colored('Evaluating for {} -- top_k {}'.format(params['res'], params['top_k']),'green'))
-        rep, loc, c1, c3, c5, mscore = evaluate_sift(
+        draw_sift_func(
             data_loader,
             output_shape=params['res'],
             top_k=params['top_k'],
-            use_color=True)
-
-        print('Repeatability {0:.3f}'.format(rep))
-        print('Localization Error {0:.3f}'.format(loc))
-        print('Correctness d1 {:.3f}'.format(c1))
-        print('Correctness d3 {:.3f}'.format(c3))
-        print('Correctness d5 {:.3f}'.format(c5))
-        print('MScore {:.3f}'.format(mscore))
+            use_color=True,
+            path="matches/hpatches/sift/r" + str(params['res'][0]))
 
 
 if __name__ == '__main__':
