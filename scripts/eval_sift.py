@@ -48,7 +48,7 @@ def main():
                                  sampler=None)
 
         print(colored('Evaluating for {} -- top_k {}'.format(params['res'], params['top_k']),'green'))
-        rep, loc, c1, c3, c5, mscore = evaluate_sift(
+        rep, loc, c1, c3, c5, mscore, num_points, num_points_50, num_points_70, num_points_90 = evaluate_sift(
             data_loader,
             output_shape=params['res'],
             top_k=params['top_k'],
@@ -60,6 +60,10 @@ def main():
         print('Correctness d3 {:.3f}'.format(c3))
         print('Correctness d5 {:.3f}'.format(c5))
         print('MScore {:.3f}'.format(mscore))
+        print(f'Num Points: {num_points}')
+        print(f'Num Points 50% conf: {num_points_50}')
+        print(f'Num Points 70% conf: {num_points_70}')
+        print(f'Num Points 90% conf: {num_points_90}')
 
 
 if __name__ == '__main__':

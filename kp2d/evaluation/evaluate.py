@@ -34,6 +34,9 @@ def evaluate_keypoint_net(data_loader, keypoint_net, output_shape=(320, 240), to
     conf_threshold = 0.0
     localization_err, repeatability = [], []
     correctness1, correctness3, correctness5, MScore = [], [], [], []
+    num_keypoints_50 = []
+    num_keypoints_70 = []
+    num_keypoints_90 = []
 
     with torch.no_grad():
         for i, sample in tqdm(enumerate(data_loader), desc="evaluate_keypoint_net"):
@@ -59,6 +62,12 @@ def evaluate_keypoint_net(data_loader, keypoint_net, output_shape=(320, 240), to
             desc2 = desc2[score_2[:, 2] > conf_threshold, :]
             score_1 = score_1[score_1[:, 2] > conf_threshold, :]
             score_2 = score_2[score_2[:, 2] > conf_threshold, :]
+            score_1_conf_50 = score_1[score_1[:, 2] > 0.5, :]
+            score_2_conf_50 = score_2[score_2[:, 2] > 0.5, :]
+            score_1_conf_70 = score_1[score_1[:, 2] > 0.70, :]
+            score_2_conf_70 = score_2[score_2[:, 2] > 0.70, :]
+            score_1_conf_90 = score_1[score_1[:, 2] > 0.90, :]
+            score_2_conf_90 = score_2[score_2[:, 2] > 0.90, :]
 
             # Prepare data for eval
             if output_shape == None:
@@ -90,8 +99,14 @@ def evaluate_keypoint_net(data_loader, keypoint_net, output_shape=(320, 240), to
             mscore = compute_matching_score(data, keep_k_points=top_k)
             MScore.append(mscore)
 
+            # Num keypoints
+            num_keypoints_50.append((score_1_conf_50.shape[0]+score_2_conf_50.shape[0])/2)
+            num_keypoints_70.append((score_1_conf_70.shape[0]+score_2_conf_70.shape[0])/2)
+            num_keypoints_90.append((score_1_conf_90.shape[0]+score_2_conf_90.shape[0])/2)
+
     return np.mean(repeatability), np.mean(localization_err), \
-           np.mean(correctness1), np.mean(correctness3), np.mean(correctness5), np.mean(MScore)
+           np.mean(correctness1), np.mean(correctness3), np.mean(correctness5), np.mean(MScore), \
+           np.mean(num_keypoints_50), np.mean(num_keypoints_70), np.mean(num_keypoints_90)
 
 def evaluate_sift(data_loader, output_shape=(320, 240), top_k=300, use_color=True):
     """SIFT evaluation script. 
@@ -113,6 +128,10 @@ def evaluate_sift(data_loader, output_shape=(320, 240), top_k=300, use_color=Tru
     conf_threshold = 0.0
     localization_err, repeatability = [], []
     correctness1, correctness3, correctness5, MScore = [], [], [], []
+    num_keypoints = []
+    num_keypoints_50 = []
+    num_keypoints_70 = []
+    num_keypoints_90 = []
     
     sift = cv2.SIFT_create(nfeatures=1500)
 
@@ -147,6 +166,13 @@ def evaluate_sift(data_loader, output_shape=(320, 240), top_k=300, use_color=Tru
         score_1 = score_1[score_1[:, 2] > conf_threshold, :]
         score_2 = score_2[score_2[:, 2] > conf_threshold, :]
 
+        score_1_conf_50 = score_1[score_1[:, 2] > 0.5, :]
+        score_2_conf_50 = score_2[score_2[:, 2] > 0.5, :]
+        score_1_conf_70 = score_1[score_1[:, 2] > 0.70, :]
+        score_2_conf_70 = score_2[score_2[:, 2] > 0.70, :]
+        score_1_conf_90 = score_1[score_1[:, 2] > 0.90, :]
+        score_2_conf_90 = score_2[score_2[:, 2] > 0.90, :]
+
         # Prepare data for eval
         if output_shape == None:
             shape_for_data = sample['image'].shape
@@ -178,5 +204,12 @@ def evaluate_sift(data_loader, output_shape=(320, 240), top_k=300, use_color=Tru
         mscore = compute_matching_score(data, keep_k_points=top_k)
         MScore.append(mscore)
 
+        # Num keypoints
+        num_keypoints.append((score_1.shape[0]+score_2.shape[0])/2)
+        num_keypoints_50.append((score_1_conf_50.shape[0]+score_2_conf_50.shape[0])/2)
+        num_keypoints_70.append((score_1_conf_70.shape[0]+score_2_conf_70.shape[0])/2)
+        num_keypoints_90.append((score_1_conf_90.shape[0]+score_2_conf_90.shape[0])/2)
+
     return np.mean(repeatability), np.mean(localization_err), \
-           np.mean(correctness1), np.mean(correctness3), np.mean(correctness5), np.mean(MScore)
+           np.mean(correctness1), np.mean(correctness3), np.mean(correctness5), np.mean(MScore), \
+           np.mean(num_keypoints), np.mean(num_keypoints_50), np.mean(num_keypoints_70), np.mean(num_keypoints_90)
